@@ -208,32 +208,38 @@
                 // Columnas: Nivel, Planeación, Docente, Enlace
                 const datos = filas.slice(1).filter(f => f.length > 1 && f[0]?.trim());
 
+                // Agrupar por nivel, normalizando el nombre
                 const niveles = {};
                 datos.forEach(fila => {
-                    const nivel = fila[0]?.trim() || '';
-                    if (!nivel) return;
-                    if (!niveles[nivel]) niveles[nivel] = [];
-                    niveles[nivel].push({
+                    const nivelOriginal = fila[0]?.trim() || '';
+                    if (!nivelOriginal) return;
+                    // Normalizar: minúsculas, sin acentos, sin espacios extra
+                    const nivelNormalizado = nivelOriginal.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    if (!niveles[nivelNormalizado]) {
+                        niveles[nivelNormalizado] = { nombre: nivelOriginal, items: [] };
+                    }
+                    niveles[nivelNormalizado].items.push({
                         planeacion: fila[1]?.trim() || '',
                         docente: fila[2]?.trim() || '',
                         enlace: fila[3]?.trim() || ''
                     });
                 });
 
-                const ordenNiveles = ['Creatividad', 'Integral', 'Específico'];
+                // Ordenar niveles: creatividad, integral, especifico
+                const orden = ['creatividad', 'integral', 'especifico'];
                 const nivelesOrdenados = {};
-                ordenNiveles.forEach(nombre => {
+                orden.forEach(nombre => {
                     if (niveles[nombre]) nivelesOrdenados[nombre] = niveles[nombre];
                 });
+                // Agregar cualquier otro nivel que no esté en el orden
                 Object.keys(niveles).forEach(nombre => {
                     if (!nivelesOrdenados[nombre]) nivelesOrdenados[nombre] = niveles[nombre];
                 });
 
                 let html = '';
-                for (const [nombreNivel, items] of Object.entries(nivelesOrdenados)) {
-                    const claseNivel = nombreNivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    html += `<h2 class="nivel-titulo ${claseNivel}">${nombreNivel}</h2>`;
-                    items.forEach(item => {
+                for (const [clave, nivel] of Object.entries(nivelesOrdenados)) {
+                    html += `<h2 class="nivel-titulo ${clave}">${nivel.nombre}</h2>`;
+                    nivel.items.forEach(item => {
                         html += `<div class="tarjeta">
                             <div class="tarjeta-info">
                                 <h3>${item.planeacion}</h3>
