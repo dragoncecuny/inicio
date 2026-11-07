@@ -208,19 +208,20 @@
                 const filas = parseCSV(textoLimpio);
                 if (filas.length < 2) throw new Error('El CSV no tiene suficientes filas');
 
+                // Detectar encabezados dinámicamente
                 const encabezados = filas[0].map(e => e.trim().toLowerCase());
                 const idxBloque = encabezados.indexOf('bloque');
                 const idxHora = encabezados.indexOf('hora');
                 const idxGrupo = encabezados.indexOf('grupo');
                 const idxDocente = encabezados.indexOf('docente');
-                const idxCupo = encabezados.indexOf('cupo');
 
-                if (idxBloque === -1 || idxHora === -1 || idxDocente === -1) {
-                    throw new Error('No se encontraron las columnas esperadas (bloque, hora, docente)');
+                if (idxBloque === -1 || idxHora === -1 || idxGrupo === -1 || idxDocente === -1) {
+                    throw new Error('No se encontraron las columnas esperadas (Bloque, Hora, Grupo, Docente)');
                 }
 
                 const datos = filas.slice(1).filter(f => f.length > 1 && f[idxBloque]?.trim());
 
+                // Agrupar por bloque (usando el texto exacto de la columna)
                 const bloques = {};
                 datos.forEach(fila => {
                     const bloque = fila[idxBloque]?.trim() || '';
@@ -228,26 +229,32 @@
                     if (!bloques[bloque]) bloques[bloque] = [];
                     bloques[bloque].push({
                         hora: fila[idxHora]?.trim() || '',
-                        grupo: idxGrupo !== -1 ? fila[idxGrupo]?.trim() || '' : '',
-                        docente: fila[idxDocente]?.trim() || '',
-                        cupo: idxCupo !== -1 ? fila[idxCupo]?.trim() || '' : ''
+                        grupo: fila[idxGrupo]?.trim() || '',
+                        docente: fila[idxDocente]?.trim() || ''
                     });
                 });
 
-                const nombresBloque = { LM: 'Lunes y Miércoles', MJ: 'Martes y Jueves', V: 'Viernes' };
+                // Ordenar los bloques para que aparezcan en orden lógico
+                const ordenBloques = ['Lunes y miércoles', 'Martes y jueves', 'Viernes'];
+                const bloquesOrdenados = {};
+                ordenBloques.forEach(nombre => {
+                    if (bloques[nombre]) bloquesOrdenados[nombre] = bloques[nombre];
+                });
+                // Agregar cualquier otro bloque que no esté en el orden
+                Object.keys(bloques).forEach(nombre => {
+                    if (!bloquesOrdenados[nombre]) bloquesOrdenados[nombre] = bloques[nombre];
+                });
 
                 let html = '';
-                for (const [clave, nombre] of Object.entries(nombresBloque)) {
-                    if (!bloques[clave] || bloques[clave].length === 0) continue;
-                    html += `<h2 class="bloque-titulo">${nombre}</h2>`;
+                for (const [nombreBloque, items] of Object.entries(bloquesOrdenados)) {
+                    html += `<h2 class="bloque-titulo">${nombreBloque}</h2>`;
                     html += `<div class="tabla-wrapper"><table>`;
-                    html += `<thead><tr><th>Hora</th><th>Grupo</th><th>Docente</th><th>Cupo</th></tr></thead><tbody>`;
-                    bloques[clave].forEach(item => {
+                    html += `<thead><tr><th>Hora</th><th>Grupo</th><th>Docente</th></tr></thead><tbody>`;
+                    items.forEach(item => {
                         html += `<tr>
                             <td>${item.hora}</td>
                             <td>${item.grupo}</td>
                             <td class="docente">${item.docente}</td>
-                            <td>${item.cupo}</td>
                         </tr>`;
                     });
                     html += `</tbody></table></div>`;
