@@ -165,12 +165,12 @@
 
         <div class="encabezado">
             <span class="dragon">🐉</span>
-            <h1> e invitaciones</h1>
+            <h1>Avisos e invitaciones</h1>
             <div class="subtitulo">Ciclo 2026-2027</div>
         </div>
 
         <div id="contenido">
-            <div class="estado">Cargando ...</div>
+            <div class="estado">Cargando avisos e invitaciones...</div>
         </div>
 
         <div class="pie">
@@ -182,7 +182,7 @@
     <script>
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZq-TaatLsqJ2SleHhcpgoWZ3LLbHvh-vCvVuqyK0H0rlQAUfZWFON3abvTF1c7b5w5rvLKIeH6AaY/pub?gid=1058000817&single=true&output=csv';
 
-        async function cargar() {
+        async function cargarAvisos() {
             const contenedor = document.getElementById('contenido');
             try {
                 const respuesta = await fetch(URL_CSV);
@@ -219,11 +219,11 @@
 
             } catch (error) {
                 contenedor.innerHTML = `<div class="estado error">
-                    No se pudieron cargar los avisos.<br>
+                    No se pudieron cargar los avisos e invitaciones.<br>
                     <small>Error: ${error.message}</small><br><br>
                     <small>Verifica que la URL del CSV sea correcta y que la hoja esté publicada como "Valores separados por comas".</small>
                 </div>`;
-                console.error('Error al cargar avisos:', error);
+                console.error('Error al cargar avisos e invitaciones:', error);
             }
         }
 
