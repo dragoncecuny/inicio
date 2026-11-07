@@ -165,12 +165,12 @@
 
         <div class="encabezado">
             <span class="dragon">🐉</span>
-            <h1>Avisos e invitaciones</h1>
+            <h1> e invitaciones</h1>
             <div class="subtitulo">Ciclo 2026-2027</div>
         </div>
 
         <div id="contenido">
-            <div class="estado">Cargando avisos...</div>
+            <div class="estado">Cargando ...</div>
         </div>
 
         <div class="pie">
@@ -182,7 +182,7 @@
     <script>
         const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZq-TaatLsqJ2SleHhcpgoWZ3LLbHvh-vCvVuqyK0H0rlQAUfZWFON3abvTF1c7b5w5rvLKIeH6AaY/pub?gid=1058000817&single=true&output=csv';
 
-        async function cargarAvisos() {
+        async function cargar() {
             const contenedor = document.getElementById('contenido');
             try {
                 const respuesta = await fetch(URL_CSV);
